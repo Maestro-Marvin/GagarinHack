@@ -45,7 +45,7 @@ final_solution/ner/new_names_and_synonyms.csv
 
 Для реализации использовалась бибилотека 
 transofrmers
-. Веса модели можно найти на huggingface: [ссылка](huggingface.co/ganjubas2008/absa-rubert-tiny).
+. Веса модели можно найти на huggingface: [ссылка]([huggingface.co/ganjubas2008/absa-rubert-tiny](https://huggingface.co/ganjubas2008/absa-rubert-tiny)).
 
 Результаты
 
