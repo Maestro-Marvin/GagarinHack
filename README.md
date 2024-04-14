@@ -5,10 +5,12 @@
 Запуск решения
 
 ```bash
+pip install -r requirements.txt
 python download_model.py
 python run_me.py
 ```
 
+решение запускается на gpu при его наличии и на cpu в противном случае
 
 ## Решение ##
 Решение состоит из двух частей: 
