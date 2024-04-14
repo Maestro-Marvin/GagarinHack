@@ -5,10 +5,10 @@ import regex as re
 
 
 def find_word_indices(texts, words, name_to_id) -> (list, list):
-    '''
+    """
     Возвращает список id словарных слов встреченных в тексте и сами слова
     :params
-    '''
+    """
     # Initialize Aho-Corasick automaton
     automaton = Automaton()
 
@@ -38,18 +38,20 @@ def find_word_indices(texts, words, name_to_id) -> (list, list):
 
 
 def process_all_messages(texts, synonyms):
-    '''
+    """
     Обёртка над функцией find_word_indices
     :params
       texts: list[str] - текст сообщения
       synonyms: (list[list[str]]) синонимы для каждой компании
-    '''
+    """
 
-    name_to_id = dict()  # по синониму к названию компании находим issuerid
+    name_to_id = (
+        dict()
+    )  # по синониму к названию компании находим issuerid
 
     for issuerid, company_synonyms in enumerate(synonyms):
         for word in company_synonyms:
-            if not word in name_to_id.keys():
+            if word not in name_to_id.keys():
                 name_to_id[word] = issuerid + 1
 
     words = np.concatenate([x.ravel() for x in synonyms])
@@ -58,28 +60,44 @@ def process_all_messages(texts, synonyms):
 
 
 def remove_emoji(text):
-    emoji_pattern = re.compile("["
-                               u"\U0001F600-\U0001F64F"  # emoticons
-                               u"\U0001F300-\U0001F5FF"  # symbols & pictographs
-                               u"\U0001F680-\U0001F6FF"  # transport & map symbols
-                               u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
-                               u"\U00002702-\U000027B0"
-                               u"\U000024C2-\U0001F251"
-                               "]+", flags=re.UNICODE)
-    return emoji_pattern.sub(r'', text)
+    emoji_pattern = re.compile(
+        "["
+        "\U0001F600-\U0001F64F"  # emoticons
+        "\U0001F300-\U0001F5FF"  # symbols & pictographs
+        "\U0001F680-\U0001F6FF"  # transport & map symbols
+        "\U0001F1E0-\U0001F1FF"  # flags (iOS)
+        "\U00002702-\U000027B0"
+        "\U000024C2-\U0001F251"
+        "]+",
+        flags=re.UNICODE,
+    )
+    return emoji_pattern.sub(r"", text)
 
 
 class NER:
-    def __init__(self, synonyms_path='./new_names_and_synonyms.csv'):
+    def __init__(self, synonyms_path="./new_names_and_synonyms.csv"):
         synonyms_db = pd.read_csv(synonyms_path)
-        stripped_series = synonyms_db['EMITENT_FULL_NAME'].str.strip().str.lower().dropna()
+        stripped_series = (
+            synonyms_db["EMITENT_FULL_NAME"]
+            .str.strip()
+            .str.lower()
+            .dropna()
+        )
         # Split, strip, exclude empty, and explode to individual elements
-        self.synonyms = stripped_series.str.split(',').apply(
-            lambda lst: np.array([item.strip() for item in lst if item.strip()])).values
+        self.synonyms = (
+            stripped_series.str.split(",")
+            .apply(
+                lambda lst: np.array(
+                    [item.strip() for item in lst if item.strip()]
+                )
+            )
+            .values
+        )
 
     def preprocessing_dataset(self, df):
-        # df["preprocessed_MessageText"] = df["MessageText"].apply(lambda text: preprocessing_text(text))
         df = df.dropna()
-        df["CompanyId"], df["CompanyName"] = process_all_messages(df["MessageText"], self.synonyms)
+        df["CompanyId"], df["CompanyName"] = process_all_messages(
+            df["MessageText"], self.synonyms
+        )
         df = df.explode(["CompanyId", "CompanyName"])
         return df
