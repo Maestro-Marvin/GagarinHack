@@ -10,6 +10,8 @@ python download_model.py
 python run_me.py
 ```
 
+run_me.py читает json c текстами из папки data и складывает скоры сообщений в results/output_scores.json
+
 Решение запускается на gpu при его наличии и на cpu в противном случае
 
 ## Решение
